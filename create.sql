@@ -1,3 +1,5 @@
+create database cccat15 encoding='UTF8';
+
 drop schema cccat15 cascade;
 
 create schema cccat15;
