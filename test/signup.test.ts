@@ -1,3 +1,4 @@
+import { getAccount } from "../src/getAccount";
 import { signup } from "../src/signup";
 
 describe('signup', () => {
@@ -17,6 +18,11 @@ describe('signup', () => {
       isPassenger: input.isPassenger,
       isDriver: input.isDriver,
     })
+    const outputGetAccount = await getAccount(output.accountId);
+    expect(outputGetAccount.name).toBe(output.name);
+    expect(outputGetAccount.email).toBe(output.email);
+    expect(outputGetAccount.cpf).toBe(output.cpf);
+    expect(outputGetAccount.is_passenger).toBe(output.isPassenger);
   })
 
   it('deve cadastrar uma conta de motorista', async () => {
