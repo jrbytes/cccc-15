@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "dev": "nodemon --exec ts-node src/signup.ts",
+    "dev": "nodemon --exec ts-node src/api.ts",
     "test": "jest --watch",
     "test:coverage": "jest --coverage"
   },
