@@ -1,7 +1,17 @@
-import { getAccount } from "../src/getAccount";
-import { signup } from "../src/signup";
+import { AccountDAODatabase } from "../src/AccountDAO";
+import GetAccount from "../src/GetAccount";
+import Signup from "../src/Signup";
+
+let signup: Signup;
+let getAccount: GetAccount;
 
 describe('signup', () => {
+  beforeEach(() => {
+    const accountDAO = new AccountDAODatabase();
+    signup = new Signup(accountDAO);
+    getAccount = new GetAccount(accountDAO);
+  })
+
   it('deve cadastrar uma conta de passageiro', async () => {
     const input = {
       name: "Junior Bytes",
@@ -10,15 +20,15 @@ describe('signup', () => {
       isPassenger: true,
       isDriver: false
     }
-    const output = await signup(input);
+    const output = await signup.execute(input);
     expect(output).toMatchObject({
       name: input.name,
-      email: input.email,
+      email: input.email, 
       cpf: input.cpf,
       isPassenger: input.isPassenger,
       isDriver: input.isDriver,
     })
-    const outputGetAccount = await getAccount(output.accountId);
+    const outputGetAccount = await getAccount.execute(output.accountId);
     expect(outputGetAccount).toMatchObject({
       name: input.name,
       email: input.email,
@@ -36,7 +46,7 @@ describe('signup', () => {
       isDriver: true,
       carPlate: "ABC1234"
     }
-    const output = await signup(input);
+    const output = await signup.execute(input);
     expect(output).toMatchObject({
       name: input.name,
       email: input.email,
@@ -45,7 +55,7 @@ describe('signup', () => {
       isDriver: input.isDriver,
       carPlate: input.carPlate,
     })
-    const outputGetAccount = await getAccount(output.accountId);
+    const outputGetAccount = await getAccount.execute(output.accountId);
     expect(outputGetAccount).toMatchObject({
       name: input.name,
       email: input.email,
@@ -64,7 +74,7 @@ describe('signup', () => {
       isPassenger: true,
       isDriver: false
     }
-    await expect(() => signup(input)).rejects.toThrowError("Invalid name");
+    await expect(() => signup.execute(input)).rejects.toThrowError("Invalid name");
   })
 
   it('não deve cadastrar se o e-mail for inválido', async () => {
@@ -75,7 +85,7 @@ describe('signup', () => {
       isPassenger: true,
       isDriver: false
     }
-    await expect(() => signup(input)).rejects.toThrowError("Invalid email");
+    await expect(() => signup.execute(input)).rejects.toThrowError("Invalid email");
   })
 
   it('não deve cadastrar se o e-mail já estiver em uso', async () => {
@@ -87,8 +97,8 @@ describe('signup', () => {
       isPassenger: true,
       isDriver: false
     }
-    await signup(input);
-    await expect(() => signup(input)).rejects.toThrowError("Email already in use");
+    await signup.execute(input);
+    await expect(() => signup.execute(input)).rejects.toThrowError("Email already in use");
   })
 
   it('não deve cadastrar se o cpf for inválido', async () => {
@@ -99,7 +109,7 @@ describe('signup', () => {
       isPassenger: true,
       isDriver: false
     }
-    await expect(() => signup(input)).rejects.toThrowError("Invalid cpf");
+    await expect(() => signup.execute(input)).rejects.toThrowError("Invalid cpf");
   })
 
   it('motorista não deve estar sem placa', async () => {
@@ -110,7 +120,7 @@ describe('signup', () => {
       isPassenger: false,
       isDriver: true,
     }
-    await expect(() => signup(input)).rejects.toThrowError("Invalid car plate");
+    await expect(() => signup.execute(input)).rejects.toThrowError("Invalid car plate");
   })
 
   it('motorista não deve estar com placa fora do padrão', async () => {
@@ -122,6 +132,6 @@ describe('signup', () => {
       isDriver: true,
       carPlate: "123456"
     }
-    await expect(() => signup(input)).rejects.toThrowError("Invalid car plate");
+    await expect(() => signup.execute(input)).rejects.toThrowError("Invalid car plate");
   })
 })
