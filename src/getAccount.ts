@@ -1,11 +1,7 @@
-import pgp from "pg-promise";
+import AccountDAO from "./AccountDAO";
 
 export async function getAccount (accountId: string): Promise<any> {
-	const connection = pgp()("postgres://postgres:123456@localhost:5432/cccat15");
-	try {
-		const [acc] = await connection.query("select * from cccat15.account where account_id = $1", [accountId]);
-		return acc
-	} finally {
-		await connection.$pool.end();
-	}
+	const accountDAO = new AccountDAO();
+	const account = await accountDAO.getById(accountId);
+	return account;
 }
