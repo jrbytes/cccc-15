@@ -19,10 +19,12 @@ describe('signup', () => {
       isDriver: input.isDriver,
     })
     const outputGetAccount = await getAccount(output.accountId);
-    expect(outputGetAccount.name).toBe(output.name);
-    expect(outputGetAccount.email).toBe(output.email);
-    expect(outputGetAccount.cpf).toBe(output.cpf);
-    expect(outputGetAccount.is_passenger).toBe(output.isPassenger);
+    expect(outputGetAccount).toMatchObject({
+      name: input.name,
+      email: input.email,
+      cpf: input.cpf,
+      is_passenger: input.isPassenger,
+    })
   })
 
   it('deve cadastrar uma conta de motorista', async () => {
@@ -42,6 +44,15 @@ describe('signup', () => {
       isPassenger: input.isPassenger,
       isDriver: input.isDriver,
       carPlate: input.carPlate,
+    })
+    const outputGetAccount = await getAccount(output.accountId);
+    expect(outputGetAccount).toMatchObject({
+      name: input.name,
+      email: input.email,
+      cpf: input.cpf,
+      is_passenger: input.isPassenger,
+      is_driver: input.isDriver,
+      car_plate: input.carPlate,
     })
   })
 
