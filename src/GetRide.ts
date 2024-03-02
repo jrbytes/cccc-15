@@ -1,15 +1,16 @@
-import RideDAO from "./RideDAO";
+import type RideRepository from './RideRepository'
 
 export default class GetRide {
-  constructor(readonly rideDAO: RideDAO) {}
+  constructor(readonly rideRepository: RideRepository) {}
 
-  async execute(rideId: string): Promise<any> {
-    const ride = await this.rideDAO.get(rideId);
-    return ride;
+  async execute(rideId: string): Promise<Output> {
+    const ride = await this.rideRepository.get(rideId)
+    if (!ride) throw new Error('Ride not found')
+    return ride
   }
 }
 
-type Output = {
+interface Output {
   passengerId: string
   rideId: string
   fromLat: number

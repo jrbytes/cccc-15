@@ -1,37 +1,40 @@
-import { v4 } from "uuid";
-import { validateCpf } from "./validateCpf";
-import AccountDAO from "./AccountDAO";
+import Account from './Account'
+import type AccountRepository from './AccountRepository'
 
-type SignupInput = {
-	name: string;
-	email: string;
-	cpf: string;
-	carPlate?: string;
-	isPassenger: boolean;
-	isDriver: boolean;
+interface SignupInput {
+  name: string
+  email: string
+  cpf: string
+  carPlate?: string
+  isPassenger: boolean
+  isDriver: boolean
+}
+
+interface SignupOutput {
+  accountId: string
+  name: string
+  email: string
+  cpf: string
+  carPlate?: string
+  isPassenger: boolean
+  isDriver: boolean
 }
 
 export default class Signup {
-	constructor(readonly accountDAO: AccountDAO){}
+  constructor(readonly accountRepository: AccountRepository) {}
 
-	async execute(input: SignupInput): Promise<any> {
-		const existingAccount = await this.accountDAO.getByEmail(input.email);
-		if (existingAccount) throw new Error("Email already in use");
-		if (!input.name.match(/[a-zA-Z] [a-zA-Z]+/)) throw new Error("Invalid name");
-		if (!input.email.match(/^(.+)@(.+)$/)) throw new Error("Invalid email");
-		if (!validateCpf(input.cpf)) throw new Error("Invalid cpf");
-		if (input.isDriver && !input.carPlate?.match(/^[A-Z]{3}\d{4}$/)) throw new Error("Invalid car plate");
-		const accountId = v4();
-		Object.assign(input, { accountId });
-		await this.accountDAO.save(input)
-		return {
-			accountId,
-			name: input.name,
-			email: input.email,
-			cpf: input.cpf,
-			carPlate: input.carPlate,
-			isPassenger: input.isPassenger,
-			isDriver: input.isDriver,
-		};
-	}
+  async execute(input: SignupInput): Promise<SignupOutput> {
+    const existingAccount = await this.accountRepository.getByEmail(input.email)
+    if (existingAccount) throw new Error('Email already in use')
+    const account = Account.create(
+      input.name,
+      input.email,
+      input.cpf,
+      input.isPassenger,
+      input.isDriver,
+      input.carPlate,
+    )
+    await this.accountRepository.save(account)
+    return account
+  }
 }

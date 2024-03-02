@@ -1,39 +1,41 @@
-import express from 'express';
-import { AccountDAODatabase } from './AccountDAO';
-import Signup from './Signup';
-import GetAccount from './GetAccount';
-import RequestRide from './RequestRide';
-import { RideDAODatabase } from './RideDAO';
-import GetRide from './GetRide';
-const app = express();
-app.use(express.json());
+import express from 'express'
+
+import { AccountRepositoryDatabase } from './AccountRepository'
+import GetAccount from './GetAccount'
+import RequestRide from './RequestRide'
+import { RideRepositoryDatabase } from './RideRepository'
+import Signup from './Signup'
+const app = express()
+app.use(express.json())
 app.post('/signup', async (req, res) => {
-  const accountDAO = new AccountDAODatabase()
-  const signup = new Signup(accountDAO);
+  const accountDAO = new AccountRepositoryDatabase()
+  const signup = new Signup(accountDAO)
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
   const output = await signup.execute(req.body)
   res.json(output)
 })
 app.get('/accounts/:accountId', async (req, res) => {
-  const accountDAO = new AccountDAODatabase()
-  const getAccount = new GetAccount(accountDAO);
+  const accountDAO = new AccountRepositoryDatabase()
+  const getAccount = new GetAccount(accountDAO)
   const output = await getAccount.execute(req.params.accountId)
   res.json(output)
 })
 app.post('/request_ride', async (req, res) => {
   try {
-    const accountDAO = new AccountDAODatabase()
-    const rideDAO = new RideDAODatabase()
-    const requestRide = new RequestRide(rideDAO, accountDAO)
+    const accountRepository = new AccountRepositoryDatabase()
+    const rideRepository = new RideRepositoryDatabase()
+    const requestRide = new RequestRide(rideRepository, accountRepository)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     const output = await requestRide.execute(req.body)
     res.json(output)
-  } catch (error: any) {
-    return res.status(422).json({ message: error.message })
+  } catch (e: any) {
+    return res.status(422).json({ message: e.message })
   }
 })
 app.get('/rides/:rideId', async (req, res) => {
-  const rideDAO = new RideDAODatabase()
-  const getRide = new GetRide(rideDAO);
-  const ride = await getRide.execute(req.params.rideId)
+  const rideRepository = new RideRepositoryDatabase()
+  const ride = await rideRepository.get(req.params.rideId)
+  if (!ride) return res.status(404).json({ message: 'Ride not found' })
   res.json(ride)
 })
-app.listen(3000);
+app.listen(3000)

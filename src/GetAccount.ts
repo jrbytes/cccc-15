@@ -1,13 +1,21 @@
-import { AccountDAODatabase } from "./AccountDAO";
+import type AccountRepository from './AccountRepository'
 
 export default class GetAccount {
-	constructor(readonly accountDAO: AccountDAODatabase){}
+  constructor(readonly accountRepository: AccountRepository) {}
 
-	async execute(accountId: string): Promise<any> {
-		const account = await this.accountDAO.getById(accountId);
-		// activate under line to pass the test in memory
-		// Object.assign(account, { is_passenger: account.isPassenger, is_driver: account.isDriver, car_plate: account.carPlate });
-		return account;
-	}
+  async execute(accountId: string): Promise<GetAccountOutput | undefined> {
+    const account = await this.accountRepository.getById(accountId)
+    if (!account) throw new Error('Account does not exist')
+    return account
+  }
 }
 
+interface GetAccountOutput {
+  accountId: string
+  name: string
+  email: string
+  cpf: string
+  carPlate?: string
+  isPassenger: boolean
+  isDriver: boolean
+}
