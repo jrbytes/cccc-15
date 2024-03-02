@@ -1,12 +1,28 @@
+import type AccountRepository from './AccountRepository'
 import type RideRepository from './RideRepository'
 
 export default class GetRide {
-  constructor(readonly rideRepository: RideRepository) {}
+  constructor(
+    readonly rideRepository: RideRepository,
+    readonly accountRepository: AccountRepository,
+  ) {}
 
   async execute(rideId: string): Promise<Output> {
     const ride = await this.rideRepository.get(rideId)
     if (!ride) throw new Error('Ride not found')
-    return ride
+    const passenger = await this.accountRepository.getById(ride.passengerId)
+    if (!passenger) throw new Error('Passenger not found')
+    return {
+      passengerId: ride.passengerId,
+      rideId: ride.rideId,
+      fromLat: ride.fromLat,
+      fromLong: ride.fromLong,
+      toLat: ride.toLat,
+      toLong: ride.toLong,
+      status: ride.status,
+      date: ride.date,
+      passengerName: passenger.name,
+    }
   }
 }
 
@@ -19,4 +35,5 @@ interface Output {
   toLong: number
   status: string
   date: Date
+  passengerName: string
 }

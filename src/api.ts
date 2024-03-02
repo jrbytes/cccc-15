@@ -2,6 +2,7 @@ import express from 'express'
 
 import { AccountRepositoryDatabase } from './AccountRepository'
 import GetAccount from './GetAccount'
+import GetRide from './GetRide'
 import RequestRide from './RequestRide'
 import { RideRepositoryDatabase } from './RideRepository'
 import Signup from './Signup'
@@ -34,8 +35,9 @@ app.post('/request_ride', async (req, res) => {
 })
 app.get('/rides/:rideId', async (req, res) => {
   const rideRepository = new RideRepositoryDatabase()
-  const ride = await rideRepository.get(req.params.rideId)
-  if (!ride) return res.status(404).json({ message: 'Ride not found' })
+  const accountRepository = new AccountRepositoryDatabase()
+  const getRide = new GetRide(rideRepository, accountRepository)
+  const ride = await getRide.execute(req.params.rideId)
   res.json(ride)
 })
 app.listen(3000)
