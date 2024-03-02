@@ -1,6 +1,5 @@
-import pgp from 'pg-promise'
-
 import Account from './Account'
+import type DatabaseConnection from './DatabaseConnection'
 
 export default interface AccountRepository {
   save: (account: Account) => Promise<void>
@@ -19,11 +18,10 @@ export interface AccountQueryType {
 }
 
 export class AccountRepositoryDatabase implements AccountRepository {
+  constructor(readonly connection: DatabaseConnection) {}
+
   async save(account: Account) {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    await connection.query(
+    await this.connection.query(
       'insert into cccat15.account (account_id, name, email, cpf, car_plate, is_passenger, is_driver) values ($1, $2, $3, $4, $5, $6, $7)',
       [
         account.accountId,
@@ -35,18 +33,13 @@ export class AccountRepositoryDatabase implements AccountRepository {
         !!account.isDriver,
       ],
     )
-    await connection.$pool.end()
   }
 
   async getByEmail(email: string) {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    const [account]: [account: AccountQueryType] = await connection.query(
+    const [account]: [account: AccountQueryType] = await this.connection.query(
       'select * from cccat15.account where email = $1',
       [email],
     )
-    await connection.$pool.end()
     if (!account) return
     return Account.restore(
       account.account_id,
@@ -60,14 +53,10 @@ export class AccountRepositoryDatabase implements AccountRepository {
   }
 
   async getById(accountId: string) {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    const [account]: [account: AccountQueryType] = await connection.query(
+    const [account]: [account: AccountQueryType] = await this.connection.query(
       'select * from cccat15.account where account_id = $1',
       [accountId],
     )
-    await connection.$pool.end()
     if (!account) return
     return Account.restore(
       account.account_id,

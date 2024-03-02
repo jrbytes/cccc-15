@@ -1,13 +1,17 @@
 import { AccountRepositoryDatabase } from '../src/AccountRepository'
+import type DatabaseConnection from '../src/DatabaseConnection'
+import { PgPromiseAdapter } from '../src/DatabaseConnection'
 import GetAccount from '../src/GetAccount'
 import Signup from '../src/Signup'
 
+let connection: DatabaseConnection
 let signup: Signup
 let getAccount: GetAccount
 
 describe('signup', () => {
   beforeEach(() => {
-    const accountDAO = new AccountRepositoryDatabase()
+    connection = new PgPromiseAdapter()
+    const accountDAO = new AccountRepositoryDatabase(connection)
     signup = new Signup(accountDAO)
     getAccount = new GetAccount(accountDAO)
   })
@@ -147,4 +151,8 @@ describe('signup', () => {
       'Invalid car plate',
     )
   })
+})
+
+afterEach(async () => {
+  await connection.close()
 })

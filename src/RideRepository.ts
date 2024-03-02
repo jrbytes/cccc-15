@@ -1,5 +1,4 @@
-import pgp from 'pg-promise'
-
+import type DatabaseConnection from './DatabaseConnection'
 import Ride from './Ride'
 
 export default interface RideRepository {
@@ -20,11 +19,10 @@ interface RideInput {
 }
 
 export class RideRepositoryDatabase implements RideRepository {
+  constructor(readonly connection: DatabaseConnection) {}
+
   async save(ride: Ride) {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    await connection.query(
+    await this.connection.query(
       'INSERT INTO cccat15.ride (ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date) values ($1, $2, $3, $4, $5, $6, $7, $8)',
       [
         ride.rideId,
@@ -37,18 +35,13 @@ export class RideRepositoryDatabase implements RideRepository {
         ride.date,
       ],
     )
-    await connection.$pool.end()
   }
 
   async get(rideId: string): Promise<Ride | undefined> {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    const [ride]: [RideInput] = await connection.query(
+    const [ride]: [RideInput] = await this.connection.query(
       'SELECT * FROM cccat15.ride where ride_id = $1',
       [rideId],
     )
-    await connection.$pool.end()
     if (!ride) return
     return Ride.restore(
       ride.ride_id,
@@ -63,14 +56,10 @@ export class RideRepositoryDatabase implements RideRepository {
   }
 
   async getActiveRidesByPassengerId(passengerId: string): Promise<any> {
-    const connection = pgp()(
-      'postgres://postgres:123456@localhost:5432/cccat15',
-    )
-    const activeRidesData: RideInput[] = await connection.query(
+    const activeRidesData: RideInput[] = await this.connection.query(
       "SELECT * FROM cccat15.ride WHERE passenger_id = $1 AND status = 'requested'",
       [passengerId],
     )
-    await connection.$pool.end()
     const activeRides: Ride[] = []
     for (const activeRideData of activeRidesData) {
       activeRides.push(
