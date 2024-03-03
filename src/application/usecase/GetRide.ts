@@ -22,7 +22,7 @@ export default class GetRide {
       toLong: ride.toLong,
       status: ride.getStatus(),
       date: ride.date,
-      passengerName: passenger.name,
+      passengerName: passenger.getName(),
     }
   }
 }

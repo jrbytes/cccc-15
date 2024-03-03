@@ -25,20 +25,15 @@ describe('signup', () => {
       isDriver: false,
     }
     const output = await signup.execute(input)
-    expect(output).toMatchObject({
-      name: input.name,
-      email: input.email,
-      cpf: input.cpf,
-      isPassenger: input.isPassenger,
-      isDriver: input.isDriver,
-    })
+    expect(output.getName()).toBe(input.name)
+    expect(output.email).toBe(input.email)
+    expect(output.cpf).toBe(input.cpf)
+    expect(output.isPassenger).toBe(input.isPassenger)
     const outputGetAccount = await getAccount.execute(output.accountId)
-    expect(outputGetAccount).toMatchObject({
-      name: input.name,
-      email: input.email,
-      cpf: input.cpf,
-      isPassenger: input.isPassenger,
-    })
+    expect(outputGetAccount.getName()).toBe(input.name)
+    expect(outputGetAccount.email).toBe(input.email)
+    expect(outputGetAccount.cpf).toBe(input.cpf)
+    expect(outputGetAccount.isPassenger).toBe(input.isPassenger)
   })
 
   it('deve cadastrar uma conta de motorista', async () => {
@@ -51,23 +46,17 @@ describe('signup', () => {
       carPlate: 'ABC1234',
     }
     const output = await signup.execute(input)
-    expect(output).toMatchObject({
-      name: input.name,
-      email: input.email,
-      cpf: input.cpf,
-      isPassenger: input.isPassenger,
-      isDriver: input.isDriver,
-      carPlate: input.carPlate,
-    })
+    expect(output.getName()).toBe(input.name)
+    expect(output.email).toBe(input.email)
+    expect(output.cpf).toBe(input.cpf)
+    expect(output.isPassenger).toBe(input.isPassenger)
+    expect(output.isDriver).toBe(input.isDriver)
+    expect(output.carPlate).toBe(input.carPlate)
     const outputGetAccount = await getAccount.execute(output.accountId)
-    expect(outputGetAccount).toMatchObject({
-      name: input.name,
-      email: input.email,
-      cpf: input.cpf,
-      isPassenger: input.isPassenger,
-      isDriver: input.isDriver,
-      carPlate: input.carPlate,
-    })
+    expect(outputGetAccount.getName()).toBe(input.name)
+    expect(outputGetAccount.email).toBe(input.email)
+    expect(outputGetAccount.cpf).toBe(input.cpf)
+    expect(outputGetAccount.isPassenger).toBe(input.isPassenger)
   })
 
   it('não deve cadastrar se o nome for inválido', async () => {

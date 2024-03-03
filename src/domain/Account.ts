@@ -1,27 +1,26 @@
 import { v4 } from 'uuid'
 
+import Name from './Name'
 import { validateCpf } from './validateCpf'
 
 export default class Account {
+  private readonly name: Name
+
   private constructor(
     readonly accountId: string,
-    readonly name: string,
+    name: string,
     readonly email: string,
     readonly cpf: string,
     readonly isPassenger: boolean,
     readonly isDriver: boolean,
     readonly carPlate?: string,
   ) {
-    if (this.isInvalidName(name)) throw new Error('Invalid name')
+    this.name = new Name(name)
     if (this.isInvalidEmail(email)) throw new Error('Invalid email')
     if (!validateCpf(cpf)) throw new Error('Invalid cpf')
     if (isDriver && carPlate && this.isInvalidCarPlate(carPlate)) {
       throw new Error('Invalid car plate')
     }
-  }
-
-  private isInvalidName(name: string) {
-    return !name.match(/[a-zA-Z] [a-zA-Z]+/)
   }
 
   private isInvalidEmail(email: string) {
@@ -70,5 +69,9 @@ export default class Account {
       isDriver,
       carPlate,
     )
+  }
+
+  getName() {
+    return this.name.getValue()
   }
 }
