@@ -26,7 +26,7 @@ export class AccountRepositoryDatabase implements AccountRepository {
       [
         account.accountId,
         account.getName(),
-        account.email,
+        account.getEmail(),
         account.cpf,
         account.carPlate,
         !!account.isPassenger,
