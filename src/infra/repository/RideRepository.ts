@@ -5,6 +5,7 @@ export default interface RideRepository {
   save: (ride: Ride) => Promise<void>
   get: (rideId: string) => Promise<Ride | undefined>
   getActiveRidesByPassengerId: (passengerId: string) => Promise<Ride[]>
+  update: (ride: Ride) => Promise<void>
 }
 
 interface RideInput {
@@ -16,6 +17,7 @@ interface RideInput {
   to_long: number
   status: string
   date: Date
+  driver_id?: string
 }
 
 export class RideRepositoryDatabase implements RideRepository {
@@ -31,7 +33,7 @@ export class RideRepositoryDatabase implements RideRepository {
         ride.fromLong,
         ride.toLat,
         ride.toLong,
-        ride.status,
+        ride.getStatus(),
         ride.date,
       ],
     )
@@ -52,6 +54,7 @@ export class RideRepositoryDatabase implements RideRepository {
       Number(ride.to_long),
       ride.status,
       ride.date,
+      ride.driver_id,
     )
   }
 
@@ -72,9 +75,17 @@ export class RideRepositoryDatabase implements RideRepository {
           Number(activeRideData.to_long),
           activeRideData.status,
           activeRideData.date,
+          activeRideData.driver_id,
         ),
       )
     }
     return activeRides
+  }
+
+  async update(ride: Ride) {
+    await this.connection.query(
+      'UPDATE cccat15.ride SET status = $1, driver_id = $2 WHERE ride_id = $3',
+      [ride.getStatus(), ride.getDriverId(), ride.rideId],
+    )
   }
 }
