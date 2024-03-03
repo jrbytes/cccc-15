@@ -1,8 +1,8 @@
-import type GetAccount from './GetAccount'
-import type GetRide from './GetRide'
+import type GetAccount from '../../application/usecase/GetAccount'
+import type GetRide from '../../application/usecase/GetRide'
+import type RequestRide from '../../application/usecase/RequestRide'
+import type Signup from '../../application/usecase/Signup'
 import type HttpServer from './HttpServer'
-import type RequestRide from './RequestRide'
-import type Signup from './Signup'
 
 export default class MainController {
   constructor(

@@ -1,4 +1,4 @@
-import type AccountRepository from './AccountRepository'
+import type AccountRepository from '../../infra/repository/AccountRepository'
 
 export default class GetAccount {
   constructor(readonly accountRepository: AccountRepository) {}

@@ -1,6 +1,6 @@
-import type AccountRepository from './AccountRepository'
-import Ride from './Ride'
-import type RideRepository from './RideRepository'
+import Ride from '../../domain/Ride'
+import type AccountRepository from '../../infra/repository/AccountRepository'
+import type RideRepository from '../../infra/repository/RideRepository'
 
 export default class RequestRide {
   constructor(

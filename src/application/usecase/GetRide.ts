@@ -1,5 +1,5 @@
-import type AccountRepository from './AccountRepository'
-import type RideRepository from './RideRepository'
+import type AccountRepository from '../../infra/repository/AccountRepository'
+import type RideRepository from '../../infra/repository/RideRepository'
 
 export default class GetRide {
   constructor(
@@ -10,7 +10,9 @@ export default class GetRide {
   async execute(rideId: string): Promise<Output> {
     const ride = await this.rideRepository.get(rideId)
     if (!ride) throw new Error('Ride not found')
-    const passenger = await this.accountRepository.getById(ride.passengerId)
+    const passenger = await this.accountRepository.getById(
+      ride.passengerId as string,
+    )
     if (!passenger) throw new Error('Passenger not found')
     return {
       passengerId: ride.passengerId,

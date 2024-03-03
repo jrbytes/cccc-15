@@ -1,5 +1,5 @@
-import Account from './Account'
-import type DatabaseConnection from './DatabaseConnection'
+import Account from '../../domain/Account'
+import type DatabaseConnection from '../database/DatabaseConnection'
 
 export default interface AccountRepository {
   save: (account: Account) => Promise<void>

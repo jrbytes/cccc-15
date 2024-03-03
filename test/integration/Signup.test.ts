@@ -1,8 +1,8 @@
-import { AccountRepositoryDatabase } from '../src/AccountRepository'
-import type DatabaseConnection from '../src/DatabaseConnection'
-import { PgPromiseAdapter } from '../src/DatabaseConnection'
-import GetAccount from '../src/GetAccount'
-import Signup from '../src/Signup'
+import GetAccount from '../../src/application/usecase/GetAccount'
+import Signup from '../../src/application/usecase/Signup'
+import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
+import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
+import { AccountRepositoryDatabase } from '../../src/infra/repository/AccountRepository'
 
 let connection: DatabaseConnection
 let signup: Signup

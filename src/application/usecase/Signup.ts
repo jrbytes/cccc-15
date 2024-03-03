@@ -1,5 +1,5 @@
-import Account from './Account'
-import type AccountRepository from './AccountRepository'
+import Account from '../../domain/Account'
+import type AccountRepository from '../../infra/repository/AccountRepository'
 
 interface SignupInput {
   name: string
