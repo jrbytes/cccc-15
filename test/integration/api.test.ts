@@ -12,23 +12,19 @@ it('deve cadastrar uma conta de passageiro', async () => {
   }
   const responseSignup = await axios.post('http://localhost:3000/signup', input)
   const outputSignup = responseSignup.data
-  expect(outputSignup).toMatchObject({
-    name: input.name,
-    email: input.email,
-    cpf: input.cpf,
-    isPassenger: input.isPassenger,
-    isDriver: input.isDriver,
-  })
+  expect(outputSignup.name.value).toBe(input.name)
+  expect(outputSignup.email.value).toBe(input.email)
+  expect(outputSignup.cpf.value).toBe(input.cpf)
+  expect(outputSignup.isPassenger).toBe(input.isPassenger)
+  expect(outputSignup.isDriver).toBe(input.isDriver)
   const responseGetAccount = await axios.get(
     `http://localhost:3000/accounts/${outputSignup.accountId}`,
   )
   const outputAccount = responseGetAccount.data
-  expect(outputAccount).toMatchObject({
-    name: input.name,
-    email: input.email,
-    cpf: input.cpf,
-    isPassenger: input.isPassenger,
-  })
+  expect(outputAccount.name.value).toBe(input.name)
+  expect(outputAccount.email.value).toBe(input.email)
+  expect(outputAccount.cpf.value).toBe(input.cpf)
+  expect(outputAccount.isPassenger).toBe(input.isPassenger)
 })
 
 it('deve solicitar uma corrida', async () => {
