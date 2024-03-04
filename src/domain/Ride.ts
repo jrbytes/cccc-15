@@ -1,10 +1,12 @@
 import { v4 } from 'uuid'
 
 import Coord from './Coord'
+import DistanceCalculator from './domainservice/DistanceCalculator'
 
 export default class Ride {
   private readonly from: Coord
   private readonly to: Coord
+  private lastPosition: Coord
 
   private constructor(
     readonly rideId: string,
@@ -15,10 +17,14 @@ export default class Ride {
     toLong: number,
     private status: string,
     readonly date: Date,
+    lastLat: number,
+    lastLong: number,
+    private distance: number,
     private driverId?: string,
   ) {
     this.from = new Coord(fromLat, fromLong)
     this.to = new Coord(toLat, toLong)
+    this.lastPosition = new Coord(lastLat, lastLong)
   }
 
   static create(
@@ -40,6 +46,9 @@ export default class Ride {
       toLong,
       status,
       date,
+      fromLat,
+      fromLong,
+      0,
     )
   }
 
@@ -52,6 +61,9 @@ export default class Ride {
     toLong: number,
     status: string,
     date: Date,
+    lastLat: number,
+    lastLong: number,
+    distance: number,
     driverId?: string,
   ) {
     return new Ride(
@@ -63,6 +75,9 @@ export default class Ride {
       toLong,
       status,
       date,
+      lastLat,
+      lastLong,
+      distance,
       driverId,
     )
   }
@@ -80,6 +95,18 @@ export default class Ride {
       throw new Error('Invalid status')
     }
     this.status = 'in_progress'
+  }
+
+  updatePosition(lat: number, long: number) {
+    if (this.status !== 'in_progress') {
+      throw new Error('Could not update position')
+    }
+    const newLastPosition = new Coord(lat, long)
+    this.distance += DistanceCalculator.calculate(
+      this.lastPosition,
+      newLastPosition,
+    )
+    this.lastPosition = newLastPosition
   }
 
   getStatus() {
@@ -104,5 +131,17 @@ export default class Ride {
 
   getToLong() {
     return this.to.getLong()
+  }
+
+  getLastLat() {
+    return this.lastPosition.getLat()
+  }
+
+  getLastLong() {
+    return this.lastPosition.getLong()
+  }
+
+  getDistance() {
+    return this.distance
   }
 }

@@ -21,6 +21,9 @@ export default class GetRide {
       toLat: ride.getToLat(),
       toLong: ride.getToLong(),
       status: ride.getStatus(),
+      lastLat: ride.getLastLat(),
+      lastLong: ride.getLastLong(),
+      distance: ride.getDistance(),
       date: ride.date,
       passengerName: passenger.getName(),
     }
@@ -36,6 +39,9 @@ interface Output {
   toLat: number
   toLong: number
   status: string
+  lastLat: number
+  lastLong: number
+  distance: number
   date: Date
   passengerName: string
 }
