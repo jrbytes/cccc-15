@@ -1,4 +1,5 @@
 import AcceptRide from '../../src/application/usecase/AcceptRide'
+import GetPositions from '../../src/application/usecase/GetPositions'
 import GetRide from '../../src/application/usecase/GetRide'
 import RequestRide from '../../src/application/usecase/RequestRide'
 import Signup from '../../src/application/usecase/Signup'
@@ -7,6 +8,7 @@ import UpdatePosition from '../../src/application/usecase/UpdatePosition'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import { AccountRepositoryDatabase } from '../../src/infra/repository/AccountRepository'
+import { PositionRepositoryDatabase } from '../../src/infra/repository/PositionRepository'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
 let connection: DatabaseConnection
@@ -16,18 +18,20 @@ let getRide: GetRide
 let acceptRide: AcceptRide
 let startRide: StartRide
 let updatePosition: UpdatePosition
+let getPositions: GetPositions
 
 beforeEach(async () => {
   connection = new PgPromiseAdapter()
   const rideRepository = new RideRepositoryDatabase(connection)
   const accountRepository = new AccountRepositoryDatabase(connection)
-  // const positionRepository = new PositionRepository(connection)
+  const positionRepository = new PositionRepositoryDatabase(connection)
   requestRide = new RequestRide(rideRepository, accountRepository)
   signup = new Signup(accountRepository)
   getRide = new GetRide(rideRepository, accountRepository)
   acceptRide = new AcceptRide(rideRepository, accountRepository)
   startRide = new StartRide(rideRepository)
-  updatePosition = new UpdatePosition(rideRepository)
+  updatePosition = new UpdatePosition(rideRepository, positionRepository)
+  getPositions = new GetPositions(positionRepository)
 })
 
 it('deve iniciar uma corrida', async () => {
@@ -75,6 +79,11 @@ it('deve iniciar uma corrida', async () => {
   expect(outputGetRide.distance).toBe(7)
   expect(outputGetRide.lastLat).toBe(-27.581092)
   expect(outputGetRide.lastLong).toBe(-48.593673)
+  const outputGetPositions = await getPositions.execute(
+    outputRequestRide.rideId,
+  )
+  expect(outputGetPositions[0].lat).toBe(-27.581092)
+  expect(outputGetPositions[0].long).toBe(-48.593673)
 })
 
 afterEach(async () => {
