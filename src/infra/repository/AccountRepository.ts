@@ -1,5 +1,7 @@
 import Account from '../../domain/Account'
 import type DatabaseConnection from '../database/DatabaseConnection'
+import AccountModel from '../orm/AccountModel'
+import ORM from '../orm/ORM'
 
 export default interface AccountRepository {
   save: (account: Account) => Promise<void>
@@ -50,6 +52,41 @@ export class AccountRepositoryDatabase implements AccountRepository {
       account.is_driver,
       account.car_plate,
     )
+  }
+
+  async getById(accountId: string) {
+    const [account]: [account: AccountQueryType] = await this.connection.query(
+      'select * from cccat15.account where account_id = $1',
+      [accountId],
+    )
+    if (!account) return
+    return Account.restore(
+      account.account_id,
+      account.name,
+      account.email,
+      account.cpf,
+      account.is_passenger,
+      account.is_driver,
+      account.car_plate,
+    )
+  }
+}
+
+export class AccountRepositoryORM implements AccountRepository {
+  orm: ORM
+
+  constructor(readonly connection: DatabaseConnection) {
+    this.orm = new ORM(connection)
+  }
+
+  async save(account: Account) {
+    await this.orm.save(AccountModel.fromAggregate(account))
+  }
+
+  async getByEmail(email: string) {
+    const account = await this.orm.findBy(AccountModel, 'email', email)
+    if (!account) return
+    return account.getAggregate()
   }
 
   async getById(accountId: string) {

@@ -2,7 +2,7 @@ import GetAccount from '../../src/application/usecase/GetAccount'
 import Signup from '../../src/application/usecase/Signup'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
-import { AccountRepositoryDatabase } from '../../src/infra/repository/AccountRepository'
+import { AccountRepositoryORM } from '../../src/infra/repository/AccountRepository'
 
 let connection: DatabaseConnection
 let signup: Signup
@@ -11,9 +11,9 @@ let getAccount: GetAccount
 describe('signup', () => {
   beforeEach(() => {
     connection = new PgPromiseAdapter()
-    const accountDAO = new AccountRepositoryDatabase(connection)
-    signup = new Signup(accountDAO)
-    getAccount = new GetAccount(accountDAO)
+    const accountRepository = new AccountRepositoryORM(connection)
+    signup = new Signup(accountRepository)
+    getAccount = new GetAccount(accountRepository)
   })
 
   it('deve cadastrar uma conta de passageiro', async () => {
@@ -30,9 +30,9 @@ describe('signup', () => {
     expect(output.getCpf()).toBe(input.cpf)
     expect(output.isPassenger).toBe(input.isPassenger)
     const outputGetAccount = await getAccount.execute(output.accountId)
-    expect(outputGetAccount.getName()).toBe(input.name)
-    expect(outputGetAccount.getEmail()).toBe(input.email)
-    expect(outputGetAccount.getCpf()).toBe(input.cpf)
+    expect(outputGetAccount.name).toBe(input.name)
+    expect(outputGetAccount.email).toBe(input.email)
+    expect(outputGetAccount.cpf).toBe(input.cpf)
     expect(outputGetAccount.isPassenger).toBe(input.isPassenger)
   })
 
@@ -53,9 +53,9 @@ describe('signup', () => {
     expect(output.isDriver).toBe(input.isDriver)
     expect(output.getCarPlate()).toBe(input.carPlate)
     const outputGetAccount = await getAccount.execute(output.accountId)
-    expect(outputGetAccount.getName()).toBe(input.name)
-    expect(outputGetAccount.getEmail()).toBe(input.email)
-    expect(outputGetAccount.getCpf()).toBe(input.cpf)
+    expect(outputGetAccount.name).toBe(input.name)
+    expect(outputGetAccount.email).toBe(input.email)
+    expect(outputGetAccount.cpf).toBe(input.cpf)
     expect(outputGetAccount.isPassenger).toBe(input.isPassenger)
   })
 

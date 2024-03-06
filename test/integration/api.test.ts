@@ -21,9 +21,9 @@ it('deve cadastrar uma conta de passageiro', async () => {
     `http://localhost:3000/accounts/${outputSignup.accountId}`,
   )
   const outputAccount = responseGetAccount.data
-  expect(outputAccount.name.value).toBe(input.name)
-  expect(outputAccount.email.value).toBe(input.email)
-  expect(outputAccount.cpf.value).toBe(input.cpf)
+  expect(outputAccount.name).toBe(input.name)
+  expect(outputAccount.email).toBe(input.email)
+  expect(outputAccount.cpf).toBe(input.cpf)
   expect(outputAccount.isPassenger).toBe(input.isPassenger)
 })
 
