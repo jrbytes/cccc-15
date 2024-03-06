@@ -1,32 +1,25 @@
-import type GetAccount from '../../application/usecase/GetAccount'
-import type GetRide from '../../application/usecase/GetRide'
-import type RequestRide from '../../application/usecase/RequestRide'
 import type Signup from '../../application/usecase/Signup'
+import Registry, { inject } from '../di/Registry'
 import type HttpServer from './HttpServer'
 
 export default class MainController {
-  constructor(
-    httpServer: HttpServer,
-    signup: Signup,
-    getAccount: GetAccount,
-    requestRide: RequestRide,
-    getRide: GetRide,
-  ) {
-    httpServer.register(
-      'post',
-      '/signup',
-      async function (params: any, body: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const output = await signup.execute(body)
-        return output
-      },
-    )
+  @inject('signup')
+  signup?: Signup
+
+  constructor(httpServer: HttpServer) {
+    const registry = Registry.getInstance()
+    httpServer.register('post', '/signup', async (params: any, body: any) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      const output = await this.signup?.execute(body)
+      return output
+    })
     httpServer.register(
       'get',
       '/accounts/:accountId',
       async function (params: any, body: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const output = await getAccount.execute(params.accountId)
+        const output = await registry
+          .inject('getAccount')
+          .execute(params.accountId)
         return output
       },
     )
@@ -34,8 +27,7 @@ export default class MainController {
       'post',
       '/request_ride',
       async function (params: any, body: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const output = await requestRide.execute(body)
+        const output = await registry.inject('requestRide').execute(body)
         return output
       },
     )
@@ -43,8 +35,7 @@ export default class MainController {
       'get',
       '/rides/:rideId',
       async function (params: any, body: any) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        const ride = await getRide.execute(params.rideId)
+        const ride = await registry.inject('getRide').execute(params.rideId)
         return ride
       },
     )
