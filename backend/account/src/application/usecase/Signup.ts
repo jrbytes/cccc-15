@@ -24,6 +24,7 @@ export default class Signup {
   constructor(readonly accountRepository: AccountRepository) {}
 
   async execute(input: SignupInput) {
+    console.log('input-test-gateway', input)
     const existingAccount = await this.accountRepository.getByEmail(input.email)
     if (existingAccount) throw new Error('Email already in use')
     const account = Account.create(

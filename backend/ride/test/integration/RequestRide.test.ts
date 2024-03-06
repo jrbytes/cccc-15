@@ -1,3 +1,4 @@
+import type AccountGateway from '../../src/application/gateway/AccountGateway'
 import GetRide from '../../src/application/usecase/GetRide'
 import RequestRide from '../../src/application/usecase/RequestRide'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
@@ -8,11 +9,12 @@ import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepositor
 let connection: DatabaseConnection
 let requestRide: RequestRide
 let getRide: GetRide
+let accountGateway: AccountGateway
 
 beforeEach(async () => {
   connection = new PgPromiseAdapter()
   const rideRepository = new RideRepositoryDatabase(connection)
-  const accountGateway = new AccountGatewayHttp()
+  accountGateway = new AccountGatewayHttp()
   requestRide = new RequestRide(rideRepository, accountGateway)
   getRide = new GetRide(rideRepository, accountGateway)
 })
@@ -26,7 +28,7 @@ it.only('deve solicitar uma corrida', async () => {
     isDriver: false,
   }
 
-  const outputSignup = await signup.execute(inputSignup)
+  const outputSignup = await accountGateway.signup(inputSignup)
   const inputRequestRide = {
     passengerId: outputSignup.accountId,
     fromLat: -27.5630991,
