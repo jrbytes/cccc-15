@@ -1,26 +1,23 @@
 import GetRide from '../../src/application/usecase/GetRide'
 import RequestRide from '../../src/application/usecase/RequestRide'
-import Signup from '../../src/application/usecase/Signup'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
-import { AccountRepositoryDatabase } from '../../src/infra/repository/AccountRepository'
+import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
 let connection: DatabaseConnection
 let requestRide: RequestRide
-let signup: Signup
 let getRide: GetRide
 
 beforeEach(async () => {
   connection = new PgPromiseAdapter()
   const rideRepository = new RideRepositoryDatabase(connection)
-  const accountRepository = new AccountRepositoryDatabase(connection)
-  requestRide = new RequestRide(rideRepository, accountRepository)
-  signup = new Signup(accountRepository)
-  getRide = new GetRide(rideRepository, accountRepository)
+  const accountGateway = new AccountGatewayHttp()
+  requestRide = new RequestRide(rideRepository, accountGateway)
+  getRide = new GetRide(rideRepository, accountGateway)
 })
 
-it('deve solicitar uma corrida', async () => {
+it.only('deve solicitar uma corrida', async () => {
   const inputSignup = {
     name: 'Junior Bytes',
     email: `johndoe${Math.random()}@gmail.com`,

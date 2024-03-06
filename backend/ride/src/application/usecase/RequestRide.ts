@@ -1,11 +1,11 @@
 import Ride from '../../domain/Ride'
-import type AccountRepository from '../../infra/repository/AccountRepository'
 import type RideRepository from '../../infra/repository/RideRepository'
+import type AccountGateway from '../gateway/AccountGateway'
 
 export default class RequestRide {
   constructor(
     readonly rideRepository: RideRepository,
-    readonly accountRepository: AccountRepository,
+    readonly accountGateway: AccountGateway,
   ) {}
 
   async execute(input: Input): Promise<Output> {
@@ -16,7 +16,7 @@ export default class RequestRide {
       input.toLat,
       input.toLong,
     )
-    const account = await this.accountRepository.getById(input.passengerId)
+    const account = await this.accountGateway.getById(input.passengerId)
     if (!account) throw new Error('Account does not exist')
     if (!account?.isPassenger)
       throw new Error('Account is not from a passenger')
