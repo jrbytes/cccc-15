@@ -4,7 +4,6 @@ export default class GetAccount {
   constructor(readonly accountRepository: AccountRepository) {}
 
   async execute(accountId: string): Promise<GetAccountOutput> {
-    console.log('getaccount-test-gateway', accountId)
     const account = await this.accountRepository.getById(accountId)
     if (!account) throw new Error('Account does not exist')
     return {
