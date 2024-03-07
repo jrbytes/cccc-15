@@ -1,10 +1,10 @@
-import type AccountRepository from '../../infra/repository/AccountRepository'
 import type RideRepository from '../../infra/repository/RideRepository'
+import type AccountGateway from '../gateway/AccountGateway'
 
 export default class AcceptRide {
   constructor(
     readonly rideRepository: RideRepository,
-    readonly accountRepository: AccountRepository,
+    readonly accountGateway: AccountGateway,
   ) {}
 
   async execute(input: Input): Promise<void> {

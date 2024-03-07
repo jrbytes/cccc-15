@@ -10,7 +10,7 @@ it('deve cadastrar uma conta de passageiro', async () => {
     isPassenger: true,
     isDriver: false,
   }
-  const responseSignup = await axios.post('http://localhost:3000/signup', input)
+  const responseSignup = await axios.post('http://localhost:3001/signup', input)
   const outputSignup = responseSignup.data
   expect(outputSignup.name.value).toBe(input.name)
   expect(outputSignup.email.value).toBe(input.email)
@@ -18,7 +18,7 @@ it('deve cadastrar uma conta de passageiro', async () => {
   expect(outputSignup.isPassenger).toBe(input.isPassenger)
   expect(outputSignup.isDriver).toBe(input.isDriver)
   const responseGetAccount = await axios.get(
-    `http://localhost:3000/accounts/${outputSignup.accountId}`,
+    `http://localhost:3001/accounts/${outputSignup.accountId}`,
   )
   const outputAccount = responseGetAccount.data
   expect(outputAccount.name).toBe(input.name)
@@ -36,7 +36,7 @@ it('deve solicitar uma corrida', async () => {
     isDriver: false,
   }
   const responseSignup = await axios.post(
-    'http://localhost:3000/signup',
+    'http://localhost:3001/signup',
     inputSignup,
   )
   const outputSignup = responseSignup.data
@@ -75,7 +75,7 @@ it('não deve solicitar uma corrida se não for passageiro', async () => {
     isDriver: true,
   }
   const responseSignup = await axios.post(
-    'http://localhost:3000/signup',
+    'http://localhost:3001/signup',
     inputSignup,
   )
   const outputSignup = responseSignup.data
@@ -103,7 +103,7 @@ it('não deve solicitar uma corrida se o passageiro tiver outra corrida com outr
     isPassenger: true,
   }
   const responseSignup = await axios.post(
-    'http://localhost:3000/signup',
+    'http://localhost:3001/signup',
     inputSignup,
   )
   const outputSignup = responseSignup.data
