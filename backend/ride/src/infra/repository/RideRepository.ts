@@ -20,6 +20,7 @@ interface RideInput {
   last_lat?: number
   last_long?: number
   distance?: number
+  fare?: number
   driver_id?: string
 }
 
@@ -28,7 +29,7 @@ export class RideRepositoryDatabase implements RideRepository {
 
   async save(ride: Ride) {
     await this.connection.query(
-      'INSERT INTO cccat15.ride (ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date, last_lat, last_long, distance) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+      'INSERT INTO cccat15.ride (ride_id, passenger_id, from_lat, from_long, to_lat, to_long, status, date, last_lat, last_long, distance, fare) values ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
       [
         ride.rideId,
         ride.passengerId,
@@ -41,6 +42,7 @@ export class RideRepositoryDatabase implements RideRepository {
         ride.getLastLat(),
         ride.getLastLong(),
         ride.getDistance(),
+        ride.getFare(),
       ],
     )
   }
@@ -63,6 +65,7 @@ export class RideRepositoryDatabase implements RideRepository {
       Number(ride.last_lat),
       Number(ride.last_long),
       Number(ride.distance),
+      Number(ride.fare),
       ride.driver_id,
     )
   }
@@ -87,6 +90,7 @@ export class RideRepositoryDatabase implements RideRepository {
           Number(activeRideData.last_lat),
           Number(activeRideData.last_long),
           Number(activeRideData.distance),
+          Number(activeRideData.fare),
           activeRideData.driver_id,
         ),
       )
@@ -96,13 +100,14 @@ export class RideRepositoryDatabase implements RideRepository {
 
   async update(ride: Ride) {
     await this.connection.query(
-      'UPDATE cccat15.ride SET status = $1, driver_id = $2, last_lat = $3, last_long = $4, distance = $5 WHERE ride_id = $6',
+      'UPDATE cccat15.ride SET status = $1, driver_id = $2, last_lat = $3, last_long = $4, distance = $5, fare = $6 WHERE ride_id = $7',
       [
         ride.getStatus(),
         ride.getDriverId(),
         ride.getLastLat(),
         ride.getLastLong(),
         ride.getDistance(),
+        ride.getFare(),
         ride.rideId,
       ],
     )

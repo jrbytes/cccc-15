@@ -2,6 +2,7 @@ import { v4 } from 'uuid'
 
 import Coord from './Coord'
 import DistanceCalculator from './domainservice/DistanceCalculator'
+import { FareCalculatorFactory } from './domainservice/FareCalculator'
 
 export default class Ride {
   private readonly from: Coord
@@ -20,6 +21,7 @@ export default class Ride {
     lastLat: number,
     lastLong: number,
     private distance: number,
+    private fare: number,
     private driverId?: string,
   ) {
     this.from = new Coord(fromLat, fromLong)
@@ -49,6 +51,7 @@ export default class Ride {
       fromLat,
       fromLong,
       0,
+      0,
     )
   }
 
@@ -64,6 +67,7 @@ export default class Ride {
     lastLat: number,
     lastLong: number,
     distance: number,
+    fare: number,
     driverId?: string,
   ) {
     return new Ride(
@@ -78,6 +82,7 @@ export default class Ride {
       lastLat,
       lastLong,
       distance,
+      fare,
       driverId,
     )
   }
@@ -107,6 +112,14 @@ export default class Ride {
       newLastPosition,
     )
     this.lastPosition = newLastPosition
+  }
+
+  finish() {
+    if (this.status !== 'in_progress') {
+      throw new Error('Invalid status')
+    }
+    this.status = 'completed'
+    this.fare = FareCalculatorFactory.create(this.date).calculate(this.distance)
   }
 
   getStatus() {
@@ -143,5 +156,9 @@ export default class Ride {
 
   getDistance() {
     return this.distance
+  }
+
+  getFare() {
+    return this.fare
   }
 }
