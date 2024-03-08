@@ -10,6 +10,7 @@ import UpdatePosition from '../../src/application/usecase/UpdatePosition'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
+import { FetchAdapter } from '../../src/infra/http/HttpClient'
 import { PositionRepositoryDatabase } from '../../src/infra/repository/PositionRepository'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
@@ -26,7 +27,7 @@ beforeEach(async () => {
   connection = new PgPromiseAdapter()
   const rideRepository = new RideRepositoryDatabase(connection)
   const positionRepository = new PositionRepositoryDatabase(connection)
-  accountGateway = new AccountGatewayHttp()
+  accountGateway = new AccountGatewayHttp(new FetchAdapter())
   requestRide = new RequestRide(rideRepository, accountGateway)
   getRide = new GetRide(rideRepository, accountGateway)
   acceptRide = new AcceptRide(rideRepository, accountGateway)
