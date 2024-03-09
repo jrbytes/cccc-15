@@ -4,6 +4,7 @@ import type AccountGateway from '../../src/application/gateway/AccountGateway'
 import AcceptRide from '../../src/application/usecase/AcceptRide'
 import FinishRide from '../../src/application/usecase/FinishRide'
 import GetRide from '../../src/application/usecase/GetRide'
+import ProcessPayment from '../../src/application/usecase/ProcessPayment'
 import RequestRide from '../../src/application/usecase/RequestRide'
 import StartRide from '../../src/application/usecase/StartRide'
 import UpdatePosition from '../../src/application/usecase/UpdatePosition'
@@ -11,6 +12,7 @@ import type DatabaseConnection from '../../src/infra/database/DatabaseConnection
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
 import { FetchAdapter } from '../../src/infra/http/HttpClient'
+import Mediator from '../../src/infra/mediator/Mediator'
 import { PositionRepositoryDatabase } from '../../src/infra/repository/PositionRepository'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
@@ -33,7 +35,12 @@ beforeEach(async () => {
   acceptRide = new AcceptRide(rideRepository, accountGateway)
   startRide = new StartRide(rideRepository)
   updatePosition = new UpdatePosition(rideRepository, positionRepository)
-  finishRide = new FinishRide(rideRepository)
+  const processPayment = new ProcessPayment(rideRepository)
+  const mediator = new Mediator()
+  mediator.register('rideCompleted', async (input: any) => {
+    await processPayment.execute(input.rideId as string)
+  })
+  finishRide = new FinishRide(rideRepository, mediator)
 })
 
 it('deve finalizar uma corrida em horário normal', async () => {

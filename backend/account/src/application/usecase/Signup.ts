@@ -35,6 +35,7 @@ export default class Signup {
       input.carPlate,
     )
     await this.accountRepository.save(account)
+    console.log('Account created: ', account)
     return account
   }
 }
