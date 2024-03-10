@@ -12,11 +12,11 @@ export default class FinishRide {
   async execute(input: Input): Promise<void> {
     const ride = await this.rideRepository.get(input.rideId)
     if (!ride) throw new Error('Ride not found')
-    ride.finish()
+    const event = ride.finish()
     console.log('FinishRide-getFare()', ride.getFare())
     await this.rideRepository.update(ride)
     // await this.mediator.notify('rideCompleted', { rideId: ride.rideId })
-    await this.queue.publish('rideCompleted', { rideId: ride.rideId })
+    await this.queue.publish(event.name, event)
   }
 }
 

@@ -39,7 +39,8 @@ beforeEach(async () => {
   const processPayment = new ProcessPayment(rideRepository)
   const mediator = new Mediator()
   mediator.register('rideCompleted', async (input: any) => {
-    await processPayment.execute(input.rideId as string)
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    await processPayment.execute(input.rideId)
   })
   const queue = new RabbitMQAdapter()
   await queue.connect()

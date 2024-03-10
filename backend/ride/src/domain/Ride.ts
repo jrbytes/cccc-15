@@ -120,6 +120,13 @@ export default class Ride {
     }
     this.status = 'completed'
     this.fare = FareCalculatorFactory.create(this.date).calculate(this.distance)
+    const event = {
+      name: 'rideCompleted',
+      rideId: this.rideId,
+      creditCardToken: '123456',
+      amount: this.getFare(),
+    }
+    return event
   }
 
   getStatus() {
