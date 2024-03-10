@@ -13,6 +13,7 @@ import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
 import { FetchAdapter } from '../../src/infra/http/HttpClient'
 import Mediator from '../../src/infra/mediator/Mediator'
+import { RabbitMQAdapter } from '../../src/infra/queue/Queue'
 import { PositionRepositoryDatabase } from '../../src/infra/repository/PositionRepository'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
@@ -40,7 +41,9 @@ beforeEach(async () => {
   mediator.register('rideCompleted', async (input: any) => {
     await processPayment.execute(input.rideId as string)
   })
-  finishRide = new FinishRide(rideRepository, mediator)
+  const queue = new RabbitMQAdapter()
+  await queue.connect()
+  finishRide = new FinishRide(rideRepository, mediator, queue)
 })
 
 it('deve finalizar uma corrida em horário normal', async () => {
