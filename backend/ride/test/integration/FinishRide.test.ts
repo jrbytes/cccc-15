@@ -13,6 +13,7 @@ import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
 import { FetchAdapter } from '../../src/infra/http/HttpClient'
 import Mediator from '../../src/infra/mediator/Mediator'
+import type Queue from '../../src/infra/queue/Queue'
 import { RabbitMQAdapter } from '../../src/infra/queue/Queue'
 import { PositionRepositoryDatabase } from '../../src/infra/repository/PositionRepository'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
@@ -25,6 +26,7 @@ let startRide: StartRide
 let updatePosition: UpdatePosition
 let accountGateway: AccountGateway
 let finishRide: FinishRide
+let queue: Queue
 
 beforeEach(async () => {
   connection = new PgPromiseAdapter()
@@ -42,7 +44,7 @@ beforeEach(async () => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     await processPayment.execute(input.rideId)
   })
-  const queue = new RabbitMQAdapter()
+  queue = new RabbitMQAdapter()
   await queue.connect()
   finishRide = new FinishRide(rideRepository, mediator, queue)
 })

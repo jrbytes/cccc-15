@@ -1,10 +1,12 @@
 import { v4 } from 'uuid'
 
+import Aggregate from './Aggregate'
 import Coord from './Coord'
 import DistanceCalculator from './domainservice/DistanceCalculator'
 import { FareCalculatorFactory } from './domainservice/FareCalculator'
+import RideCompletedEvent from './event/RideCompletedEvent'
 
-export default class Ride {
+export default class Ride extends Aggregate {
   private readonly from: Coord
   private readonly to: Coord
   private lastPosition: Coord
@@ -24,6 +26,7 @@ export default class Ride {
     private fare: number,
     private driverId?: string,
   ) {
+    super()
     this.from = new Coord(fromLat, fromLong)
     this.to = new Coord(toLat, toLong)
     this.lastPosition = new Coord(lastLat, lastLong)
@@ -120,13 +123,7 @@ export default class Ride {
     }
     this.status = 'completed'
     this.fare = FareCalculatorFactory.create(this.date).calculate(this.distance)
-    const event = {
-      name: 'rideCompleted',
-      rideId: this.rideId,
-      creditCardToken: '123456',
-      amount: this.getFare(),
-    }
-    return event
+    this.notify(new RideCompletedEvent(this.rideId, '123456', this.getFare()))
   }
 
   getStatus() {

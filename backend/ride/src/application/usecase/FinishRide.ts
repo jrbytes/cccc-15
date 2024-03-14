@@ -1,3 +1,4 @@
+import type DomainEvent from '../../domain/event/DomainEvent'
 import type Mediator from '../../infra/mediator/Mediator'
 import type Queue from '../../infra/queue/Queue'
 import type RideRepository from '../../infra/repository/RideRepository'
@@ -12,11 +13,11 @@ export default class FinishRide {
   async execute(input: Input): Promise<void> {
     const ride = await this.rideRepository.get(input.rideId)
     if (!ride) throw new Error('Ride not found')
-    const event = ride.finish()
-    console.log('FinishRide-getFare()', ride.getFare())
-    await this.rideRepository.update(ride)
-    // await this.mediator.notify('rideCompleted', { rideId: ride.rideId })
-    await this.queue.publish(event.name, event)
+    ride.register('rideCompleted', async (event: DomainEvent) => {
+      await this.rideRepository.update(ride)
+      await this.queue.publish(event.name, event)
+    })
+    ride.finish()
   }
 }
 

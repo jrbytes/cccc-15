@@ -2,6 +2,7 @@ import amqp from 'amqplib'
 
 export default interface Queue {
   connect: () => Promise<void>
+  disconnect: () => Promise<void>
   consume: (queue: string, callback: any) => Promise<void>
   publish: (queue: string, data: any) => Promise<void>
 }
@@ -11,6 +12,10 @@ export class RabbitMQAdapter implements Queue {
 
   async connect() {
     this.connection = await amqp.connect('amqp://localhost')
+  }
+
+  async disconnect() {
+    this.connection.close()
   }
 
   async consume(queue: string, callback: any) {

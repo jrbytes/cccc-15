@@ -4,7 +4,7 @@ export default class ProcessPayment {
   constructor(readonly rideRepository: RideRepository) {}
 
   async execute(input: Input) {
-    console.log('Processing payment for ride: ', input)
+    console.log(`RabbitMQ :: ProcessingPayment for Ride :: ${input.rideId}`)
   }
 }
 
