@@ -64,6 +64,7 @@ it('deve iniciar uma corrida', async () => {
   await startRide.execute(inputStartRide)
   const outputGetRide = await getRide.execute(outputRequestRide.rideId)
   expect(outputGetRide.status).toBe('in_progress')
+  console.log(outputGetRide)
 })
 
 afterEach(async () => {
