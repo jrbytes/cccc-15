@@ -1,8 +1,9 @@
 import Ride from '../../domain/Ride'
 import type RideRepository from '../../infra/repository/RideRepository'
 import type AccountGateway from '../gateway/AccountGateway'
+import type UseCase from './UseCase'
 
-export default class RequestRide {
+export default class RequestRide implements UseCase {
   constructor(
     readonly rideRepository: RideRepository,
     readonly accountGateway: AccountGateway,

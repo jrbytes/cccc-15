@@ -1,6 +1,9 @@
+import LogDecorator from '../../src/application/decorator/LogDecorator'
+import SecurityDecorator from '../../src/application/decorator/SecurityDecorator'
 import type AccountGateway from '../../src/application/gateway/AccountGateway'
 import GetRide from '../../src/application/usecase/GetRide'
 import RequestRide from '../../src/application/usecase/RequestRide'
+import type UseCase from '../../src/application/usecase/UseCase'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
@@ -8,7 +11,7 @@ import { AxiosAdapter } from '../../src/infra/http/HttpClient'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
 let connection: DatabaseConnection
-let requestRide: RequestRide
+let requestRide: UseCase
 let getRide: GetRide
 let accountGateway: AccountGateway
 
@@ -16,11 +19,13 @@ beforeEach(async () => {
   connection = new PgPromiseAdapter()
   const rideRepository = new RideRepositoryDatabase(connection)
   accountGateway = new AccountGatewayHttp(new AxiosAdapter())
-  requestRide = new RequestRide(rideRepository, accountGateway)
+  requestRide = new SecurityDecorator(
+    new LogDecorator(new RequestRide(rideRepository, accountGateway)),
+  )
   getRide = new GetRide(rideRepository, accountGateway)
 })
 
-it.only('deve solicitar uma corrida', async () => {
+it('deve solicitar uma corrida', async () => {
   const inputSignup = {
     name: 'Junior Bytes',
     email: `johndoe${Math.random()}@gmail.com`,
@@ -39,7 +44,9 @@ it.only('deve solicitar uma corrida', async () => {
   }
   const outputRequestRide = await requestRide.execute(inputRequestRide)
   expect(outputRequestRide.rideId).toBeDefined()
-  const outputGetRide = await getRide.execute(outputRequestRide.rideId)
+  const outputGetRide = await getRide.execute(
+    outputRequestRide.rideId as string,
+  )
   expect(outputGetRide.passengerId).toBe(inputRequestRide.passengerId)
   expect(outputGetRide.rideId).toBe(outputRequestRide.rideId)
   expect(outputGetRide.fromLat).toBe(Number(inputRequestRide.fromLat))

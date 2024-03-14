@@ -12,10 +12,12 @@ export default class GetRide {
     if (!ride) throw new Error('Ride not found')
     const passenger = await this.accountGateway.getById(ride.passengerId)
     if (!passenger) throw new Error('Passenger not found')
-    const driverId = ride.getDriverId()
-    let driver
-    if (driverId) {
-      driver = await this.accountGateway.getById(driverId)
+    const driver = async () => {
+      const driverId = ride.getDriverId()
+      const result = driverId
+        ? await this.accountGateway.getById(driverId)
+        : null
+      return result
     }
     return {
       passengerId: ride.passengerId,
@@ -32,7 +34,7 @@ export default class GetRide {
       fare: ride.getFare(),
       date: ride.date,
       passengerName: passenger.name,
-      driverName: driver.name,
+      driverName: driver.name ?? driver.name,
     }
   }
 }
@@ -52,5 +54,5 @@ interface Output {
   fare: number
   date: Date
   passengerName: string
-  driverName: string
+  driverName?: string
 }
