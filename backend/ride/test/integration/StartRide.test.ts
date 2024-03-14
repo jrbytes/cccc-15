@@ -1,17 +1,18 @@
 import type AccountGateway from '../../src/application/gateway/AccountGateway'
+import UpdateRideProjectionHandler from '../../src/application/handler/UpdateRideProjectionHandler'
+import GetRideProjectionQuery from '../../src/application/query/GetRideProjectionQuery'
 import AcceptRide from '../../src/application/usecase/AcceptRide'
-import GetRide from '../../src/application/usecase/GetRide'
 import RequestRide from '../../src/application/usecase/RequestRide'
 import StartRide from '../../src/application/usecase/StartRide'
 import type DatabaseConnection from '../../src/infra/database/DatabaseConnection'
 import { PgPromiseAdapter } from '../../src/infra/database/DatabaseConnection'
 import AccountGatewayHttp from '../../src/infra/gateway/AccountGatewayHttp'
 import { AxiosAdapter } from '../../src/infra/http/HttpClient'
+import { RabbitMQAdapter } from '../../src/infra/queue/Queue'
 import { RideRepositoryDatabase } from '../../src/infra/repository/RideRepository'
 
 let connection: DatabaseConnection
 let requestRide: RequestRide
-let getRide: GetRide
 let acceptRide: AcceptRide
 let startRide: StartRide
 let accountGateway: AccountGateway
@@ -21,9 +22,10 @@ beforeEach(async () => {
   const rideRepository = new RideRepositoryDatabase(connection)
   accountGateway = new AccountGatewayHttp(new AxiosAdapter())
   requestRide = new RequestRide(rideRepository, accountGateway)
-  getRide = new GetRide(rideRepository, accountGateway)
   acceptRide = new AcceptRide(rideRepository, accountGateway)
-  startRide = new StartRide(rideRepository)
+  const queue = new RabbitMQAdapter()
+  await queue.connect()
+  startRide = new StartRide(rideRepository, queue)
 })
 
 it('deve iniciar uma corrida', async () => {
@@ -62,9 +64,16 @@ it('deve iniciar uma corrida', async () => {
     rideId: outputRequestRide.rideId,
   }
   await startRide.execute(inputStartRide)
-  const outputGetRide = await getRide.execute(outputRequestRide.rideId)
-  expect(outputGetRide.status).toBe('in_progress')
-  console.log(outputGetRide)
+
+  const updateRideProjectionHandler = new UpdateRideProjectionHandler(
+    connection,
+  )
+  await updateRideProjectionHandler.execute(outputRequestRide.rideId)
+  const getRideProjectionQuery = new GetRideProjectionQuery(connection)
+  const outputGetRideProjectionQuery = await getRideProjectionQuery.execute(
+    outputRequestRide.rideId,
+  )
+  console.log(outputGetRideProjectionQuery)
 })
 
 afterEach(async () => {

@@ -1,3 +1,4 @@
+import UpdateRideProjectionHandler from './application/handler/UpdateRideProjectionHandler'
 import GetRide from './application/usecase/GetRide'
 import ProcessPayment from './application/usecase/ProcessPayment'
 import RequestRide from './application/usecase/RequestRide'
@@ -21,6 +22,9 @@ async function main() {
   const accountGateway = new AccountGatewayHttp(new AxiosAdapter())
   const requestRide = new RequestRide(rideRepository, accountGateway)
   const processPayment = new ProcessPayment(rideRepository)
+  const updateRideProjectionHandler = new UpdateRideProjectionHandler(
+    connection,
+  )
   const mediator = new Mediator()
   mediator.register('rideCompleted', async (input: any) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
@@ -33,7 +37,7 @@ async function main() {
   registry.register('getRide', getRide)
   // registry.register('finishRide', finishRide)
   new MainController(httpServer)
-  new QueueController(queue, processPayment)
+  new QueueController(queue, processPayment, updateRideProjectionHandler)
   httpServer.listen(3000)
 }
 
