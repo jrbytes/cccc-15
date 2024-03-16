@@ -1,8 +1,15 @@
 import './App.css'
-import useApp from './useApp'
+import { useSignupForm } from './domain/useSignupForm'
 
 function App() {
-  const { state, setState, calculateProgress, next, previous, submit } = useApp()
+  const {
+    state,
+    setState,
+    calculateProgress,
+    next,
+    previous,
+    submit
+  } = useSignupForm()
 
   return (
     <>
@@ -57,7 +64,7 @@ function App() {
         </>
       )}
       <br />
-      <button onClick={() => previous()} hidden={state.step >= 3}>Anterior</button>
+      <button onClick={() => previous()}>Anterior</button>
       <button onClick={() => next()} hidden={state.step >= 3}>Próximo</button>
       <button hidden={state.step !== 3} onClick={() => submit()}>Enviar</button>
     </>

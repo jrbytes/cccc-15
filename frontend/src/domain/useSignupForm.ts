@@ -1,7 +1,8 @@
-import axios from "axios";
 import { useState } from "react";
+import { AxiosAdapter } from "../infra/http/HttpClient";
+import { AccountGatewayHttp } from "../infra/gateway/AccountGateway";
 
-export default function useApp() {
+export function useSignupForm() {
   const [state, setState] = useState({
     isPassenger: false,
     isDriver: false,
@@ -91,8 +92,9 @@ export default function useApp() {
         email: state.email,
         cpf: state.cpf
       }
-      const response = await axios.post('http://localhost:3001/signup', data)
-      console.log(response.data)
+      const httpClient = new AxiosAdapter()
+      const accountGateway = new AccountGatewayHttp(httpClient)
+      await accountGateway.signup(data)
       setState({ ...state, success: 'Conta criada com sucesso' })
     }
   }

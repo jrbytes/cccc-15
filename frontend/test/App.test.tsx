@@ -6,6 +6,9 @@ import axios from 'axios'
 
 vi.mock('axios')
 const mockedAxios = axios as vitest.Mocked<typeof axios>
+mockedAxios.post.mockResolvedValue({ 
+  data: { accountId: '123' }
+})
 
 test("deve criar uma conta de um passageiro por meio do wizard", async () => {
   const { getByLabelText, getByText, getByRole, findByText } = render(<App />)
@@ -45,9 +48,6 @@ test("deve criar uma conta de um passageiro por meio do wizard", async () => {
   expect(buttonNext.hidden).toBe(true)
   const submitButton = getByRole('button', { name: 'Enviar' })
   expect(submitButton).toBeDefined()
-  mockedAxios.post.mockResolvedValue({ 
-    data: { success: 'Conta criada com sucesso' } 
-  })
   fireEvent.click(submitButton)
   await waitFor(async() => expect(await findByText('Conta criada com sucesso')).toBeDefined())
 })
